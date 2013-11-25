@@ -23,8 +23,7 @@ PRODUCT_PACKAGES := \
     libfwdlockengine
 
 PRODUCT_PACKAGES += \
-    LiveWallpapersPicker \
-    PhaseBeam
+    LiveWallpapersPicker
 
 # Additional settings used in all AOSP builds
 PRODUCT_PROPERTY_OVERRIDES := \
