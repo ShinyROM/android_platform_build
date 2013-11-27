@@ -479,6 +479,7 @@ def WriteFullOTAPackage(input_zip, output_zip):
   script.AppendExtra('set_perm_recursive(0, 0, 0755, 0644, "/system/app");')
   script.AppendExtra('set_perm_recursive(0, 0, 0755, 0644, "/system/priv-app");')
   
+  script.Print("")
   script.Print("Done! Installation was successful. Enjoy!")
   
   device_specific.FullOTA_InstallEnd()
