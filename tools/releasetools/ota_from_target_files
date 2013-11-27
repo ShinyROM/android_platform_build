@@ -61,6 +61,7 @@ if sys.hexversion < 0x02040000:
   sys.exit(1)
 
 import copy
+import datetime
 import errno
 import os
 import re
@@ -404,6 +405,24 @@ def WriteFullOTAPackage(input_zip, output_zip):
   AppendAssertions(script, OPTIONS.info_dict)
   device_specific.FullOTA_Assertions()
   device_specific.FullOTA_InstallBegin()
+  
+  buildDate = datetime.datetime.now().strftime("%m%d%y")
+  intendedDevice = os.environ["AOSP_INTENDED_DEVICE"]
+  script.Print("");
+  script.Print("Installing Shiny ROM build " + buildDate)
+  script.Print("for " + intendedDevice)
+
+  script.ShowProgress(0.5, 0)
+  script.AppendExtra('run_program("/sbin/busybox", "mount", "/system");')
+  script.AppendExtra('run_program("/sbin/busybox", "mount", "-o", "rw,remount", "/system", "/system");')
+  script.AppendExtra('run_program("/sbin/busybox", "mount", "-o", "rw,remount", "/", "/");')
+  script.AppendExtra('run_program("/sbin/busybox", "cp", "/system/app/Superuser.apk", "/Superuser.apk");')
+  script.AppendExtra('run_program("/sbin/busybox", "cp", "/system/xbin/su", "/su");')
+  script.AppendExtra('run_program("/sbin/busybox", "cp", "/system/etc/init.d/99SuperSUDaemon", "/init.d/99SuperSUDaemon");')
+  script.AppendExtra('run_program("/sbin/busybox", "cp", "/system/xbin/daemonsu", "/daemonsu");')
+  script.AppendExtra('run_program("/sbin/busybox", "cp", "/system/bin/.ext/.su", "/.ext/.su");')
+  script.AppendExtra('run_program("/sbin/busybox", "cp", "/system/etc/install-recovery.sh", "/install-recovery.sh");')
+  script.AppendExtra('unmount("/system");')
 
   script.ShowProgress(0.5, 0)
 
@@ -416,6 +435,19 @@ def WriteFullOTAPackage(input_zip, output_zip):
   script.FormatPartition("/system")
   script.Mount("/system")
   script.UnpackPackageDir("system", "/system")
+  
+  script.AppendExtra('run_program("/sbin/busybox", "cp", "/Superuser.apk", "/system/app/Superuser.apk");')
+  script.AppendExtra('run_program("/sbin/busybox", "cp", "/su", "/system/xbin/su");')
+  script.AppendExtra('run_program("/sbin/busybox", "cp", "--parents", "/.ext/.su", "/system/bin");')
+  script.AppendExtra('run_program("/sbin/busybox", "cp", "/daemonsu", "/system/xbin/daemonsu");')
+  script.AppendExtra('run_program("/sbin/busybox", "cp", "--parents", "/init.d/99SuperSUDaemon", "/system/etc");')
+  script.AppendExtra('run_program("/sbin/busybox", "cp", "/install-recovery.sh", "/system/etc/install-recovery.sh");')
+  script.AppendExtra('run_program("/sbin/busybox", "rm", "/Superuser.apk");')
+  script.AppendExtra('run_program("/sbin/busybox", "rm", "/su");')
+  script.AppendExtra('run_program("/sbin/busybox", "rm", "-r", "/init.d");')
+  script.AppendExtra('run_program("/sbin/busybox", "rm", "/daemonsu");')
+  script.AppendExtra('run_program("/sbin/busybox", "rm", "/install-recovery.sh");')
+  script.AppendExtra('run_program("/sbin/busybox", "rm", "-r", "/.ext");')
 
   symlinks = CopySystemFiles(input_zip, output_zip)
   script.MakeSymlinks(symlinks)
@@ -434,6 +466,21 @@ def WriteFullOTAPackage(input_zip, output_zip):
   script.WriteRawImage("/boot", "boot.img")
 
   script.ShowProgress(0.1, 0)
+  
+  script.AppendExtra('set_perm_recursive(0, 2000, 0755, 0755, "/system/xbin");')
+  script.AppendExtra('run_program("/sbin/busybox", "chmod", "0777", "/system/bin/.ext");')
+  script.AppendExtra('run_program("/sbin/busybox", "chmod", "06755", "/system/bin/.ext/.su");')
+  script.AppendExtra('run_program("/sbin/busybox", "chmod", "06755", "/system/xbin/su");')
+  script.AppendExtra('run_program("/sbin/busybox", "chmod", "06755", "/system/xbin/daemonsu");')
+  script.AppendExtra('run_program("/sbin/busybox", "chmod", "0755", "/system/etc/install-recovery.sh");')
+  script.AppendExtra('run_program("/sbin/busybox", "chmod", "0755", "/system/etc/init.d/99SuperSUDaemon");')
+  script.AppendExtra('run_program("/sbin/busybox", "chmod", "0644", "/system/app/Superuser.apk");')
+  
+  script.AppendExtra('set_perm_recursive(0, 0, 0755, 0644, "/system/app");')
+  script.AppendExtra('set_perm_recursive(0, 0, 0755, 0644, "/system/priv-app");')
+  
+  script.Print("Done! Installation was successful. Enjoy!")
+  
   device_specific.FullOTA_InstallEnd()
 
   if OPTIONS.extra_script is not None:
