@@ -55,15 +55,16 @@ PRODUCT_PACKAGES := \
 	QuickSearchBox \
 	WidgetPreview \
 	librs_jni \
-	ConnectivityTest \
-	GpsLocationTest \
 	CalendarProvider \
 	Calendar \
 	SmokeTest \
 	SmokeTestApp \
+	EmulatorSmokeTests \
 	rild \
 	LegacyCamera \
 	Dialer
+
+
 
 # Define the host tools and libs that are parts of the SDK.
 -include sdk/build/product_sdk.mk
@@ -91,7 +92,14 @@ PRODUCT_COPY_FILES := \
 
 include $(SRC_TARGET_DIR)/product/emulator.mk
 
+$(call inherit-product-if-exists, frameworks/base/data/sounds/AllAudio.mk)
 $(call inherit-product-if-exists, frameworks/base/data/fonts/fonts.mk)
+$(call inherit-product-if-exists, external/google-fonts/dancing-script/fonts.mk)
+$(call inherit-product-if-exists, external/google-fonts/carrois-gothic-sc/fonts.mk)
+$(call inherit-product-if-exists, external/google-fonts/coming-soon/fonts.mk)
+$(call inherit-product-if-exists, external/noto-fonts/fonts.mk)
+$(call inherit-product-if-exists, external/naver-fonts/fonts.mk)
+$(call inherit-product-if-exists, external/sil-fonts/fonts.mk)
 $(call inherit-product-if-exists, frameworks/base/data/keyboards/keyboards.mk)
 $(call inherit-product-if-exists, frameworks/webview/chromium/chromium.mk)
 $(call inherit-product, $(SRC_TARGET_DIR)/product/core.mk)

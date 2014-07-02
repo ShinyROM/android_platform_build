@@ -31,10 +31,11 @@ PRODUCT_PACKAGES += \
     dhcpcd-run-hooks \
     dnsmasq \
     framework \
+    framework2 \
     fsck_msdos \
     ime \
+    input \
     javax.obex \
-    libSR_AudioIn \
     libandroid \
     libandroid_runtime \
     libandroid_servers \
@@ -78,7 +79,6 @@ PRODUCT_PACKAGES += \
     libutils \
     libvisualizer \
     libvorbisidec \
-    libwpa_client \
     media \
     media_cmd \
     mediaserver \

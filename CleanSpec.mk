@@ -211,11 +211,37 @@ $(call add-clean-step, rm -rf $(PRODUCT_OUT)/system/build.prop)
 # 4.4.2
 $(call add-clean-step, rm -rf $(PRODUCT_OUT)/system/build.prop)
 
-# 4.4.3
+# Rename persist.sys.dalvik.vm.lib to allow new default
 $(call add-clean-step, rm -rf $(PRODUCT_OUT)/system/build.prop)
 
 # 4.4.4
 $(call add-clean-step, rm -rf $(PRODUCT_OUT)/system/build.prop)
+
+# Add ro.product.cpu.abilist{32,64} to build.prop.
+$(call add-clean-step, rm -rf $(PRODUCT_OUT)/system/build.prop)
+
+# Adding dalvik.vm.dex2oat-flags to eng builds
+$(call add-clean-step, rm -rf $(PRODUCT_OUT)/system/build.prop)
+
+# Unset TARGET_PREFER_32_BIT_APPS for 64 bit targets.
+$(call add-clean-step, rm -rf $(PRODUCT_OUT)/system/build.prop)
+
+# Switching the x86 emulator over to a 64 bit primary zygote.
+$(call add-clean-step, rm -rf $(PRODUCT_OUT)/system/build.prop)
+$(call add-clean-step, rm -rf $(PRODUCT_OUT)/root/default.prop)
+
+# Rename persist.sys.dalvik.vm.lib.1 to allow new default
+$(call add-clean-step, rm -rf $(PRODUCT_OUT)/system/build.prop)
+
+# Switching PRODUCT_RUNTIMES default for some devices
+$(call add-clean-step, rm -rf $(PRODUCT_OUT)/system/build.prop)
+
+# Switching to 32-bit-by-default host multilib build
+$(call add-clean-step, rm -rf $(HOST_OUT_INTERMEDIATES))
+
+# Change ro.zygote for core_64_bit.mk from zygote32_64 to zygote64_32
+$(call add-clean-step, rm -rf $(PRODUCT_OUT)/root/default.prop)
+$(call add-clean-step, rm -rf $(PRODUCT_OUT)/recovery/root/default.prop)
 
 # ************************************************
 # NEWER CLEAN STEPS MUST BE AT THE END OF THE LIST

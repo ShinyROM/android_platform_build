@@ -195,7 +195,7 @@ renderscript_intermediate := $(intermediates)/renderscript
 
 # We don't need the .so files in bundled branches
 # Prevent these from showing up on the device
-ifneq (,$(TARGET_BUILD_APPS))
+ifneq (,$(TARGET_BUILD_APPS)$(FORCE_BUILD_RS_COMPAT))
 
 rs_compatibility_jni_libs := $(addprefix \
     $(renderscript_intermediate)/librs., \
@@ -251,6 +251,11 @@ include $(BUILD_SYSTEM)/base_rules.mk
 #######################################
 
 java_alternative_checked_module :=
+
+#######################################
+# defines built_odex along with rule to install odex
+include $(BUILD_SYSTEM)/dex_preopt_odex_install.mk
+#######################################
 
 # Make sure there's something to build.
 ifdef full_classes_jar
@@ -430,8 +435,14 @@ endif  # LOCAL_PROGUARD_ENABLED is not nosystem
 proguard_flag_files := $(addprefix $(LOCAL_PATH)/, $(LOCAL_PROGUARD_FLAG_FILES))
 LOCAL_PROGUARD_FLAGS += $(addprefix -include , $(proguard_flag_files))
 
+ifdef LOCAL_TEST_MODULE_TO_PROGUARD_WITH
+extra_input_jar := $(call intermediates-dir-for,APPS,$(LOCAL_TEST_MODULE_TO_PROGUARD_WITH),,COMMON)/classes.jar
+else
+extra_input_jar :=
+endif
+$(full_classes_proguard_jar): PRIVATE_EXTRA_INPUT_JAR := $(extra_input_jar)
 $(full_classes_proguard_jar): PRIVATE_PROGUARD_FLAGS := $(proguard_flags) $(LOCAL_PROGUARD_FLAGS)
-$(full_classes_proguard_jar) : $(full_classes_jar) $(proguard_flag_files) | $(ACP) $(PROGUARD)
+$(full_classes_proguard_jar) : $(full_classes_jar) $(extra_input_jar) $(proguard_flag_files) | $(ACP) $(PROGUARD)
 	$(call transform-jar-to-proguard)
 
 else  # LOCAL_PROGUARD_ENABLED not defined

@@ -37,6 +37,7 @@ PRODUCT_PACKAGES += \
     com.android.media.remotedisplay.xml \
     drmserver \
     framework-res \
+    idmap \
     installd \
     ip \
     ip-up-vpn \
@@ -52,14 +53,32 @@ PRODUCT_PACKAGES += \
     libfilterfw \
     libsqlite_jni \
     libwilhelm \
+    logd \
     make_ext4fs \
     screencap \
     sensorservice \
     uiautomator
 
-PRODUCT_BOOT_JARS := core:conscrypt:okhttp:core-junit:bouncycastle:ext:framework:framework2:android.policy:services:apache-xml:webviewchromium
+# The order of PRODUCT_BOOT_JARS matters.
+PRODUCT_BOOT_JARS := \
+    core-libart \
+    conscrypt \
+    okhttp \
+    core-junit \
+    bouncycastle \
+    ext \
+    framework \
+    framework2 \
+    android.policy \
+    services \
+    apache-xml \
+    webviewchromium
 
-PRODUCT_RUNTIMES := runtime_libdvm_default
-PRODUCT_RUNTIMES += runtime_libart
+PRODUCT_RUNTIMES := runtime_libart_default
+
+PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
+    ro.zygote=zygote32
+PRODUCT_COPY_FILES += \
+    system/core/rootdir/init.zygote32.rc:root/init.zygote32.rc
 
 $(call inherit-product, $(SRC_TARGET_DIR)/product/base.mk)

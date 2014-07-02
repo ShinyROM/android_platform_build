@@ -41,12 +41,6 @@
 #define HAVE_FUTEX
 
 /*
- * Define if we already have the futex wrapper functions defined. Yes if
- * compiling against bionic.
- */
-#define HAVE_FUTEX_WRAPPERS 1
-
-/*
  * Process creation model.  Choose one:
  *
  * HAVE_FORKEXEC - use fork() and exec()
@@ -132,12 +126,6 @@
 #define HAVE_POSIX_CLOCKS
 
 /*
- * Define this if we have pthread_cond_timedwait_monotonic() and
- * clock_gettime(CLOCK_MONOTONIC).
- */
-#define HAVE_TIMEDWAIT_MONOTONIC
-
-/*
  * Define this if we have linux style epoll()
  */
 #define HAVE_EPOLL
@@ -157,10 +145,10 @@
  * agree on the same size.  For desktop systems, use 64-bit values,
  * because some of our libraries (e.g. wxWidgets) expect to be built that way.
  */
-/*
- * #define _FILE_OFFSET_BITS 64
- * #define _LARGEFILE_SOURCE 1
- */
+#if __LP64__
+#define _FILE_OFFSET_BITS 64
+#endif
+/* #define _LARGEFILE_SOURCE 1 */
 
 /*
  * Define if platform has off64_t (and lseek64 and other xxx64 functions)
@@ -259,19 +247,9 @@
 #define OS_SHARED_LIB_FORMAT_STR    "lib%s.so"
 
 /*
- * Do we have __memcmp16()?
- */
-/* #define HAVE__MEMCMP16  1 */
-
-/*
  * type for the third argument to mincore().
  */
 #define MINCORE_POINTER_TYPE unsigned char *
-
-/*
- * Do we have the sigaction flag SA_NOCLDWAIT?
- */
-#define HAVE_SA_NOCLDWAIT
 
 /*
  * The default path separator for the platform

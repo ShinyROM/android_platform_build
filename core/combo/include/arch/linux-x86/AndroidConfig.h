@@ -128,17 +128,8 @@
 
 /*
  * Define this if have clock_gettime() and friends
- *
- * Desktop Linux has this in librt, but it's broken in goobuntu, yielding
- * mildly or wildly inaccurate results.
  */
-/*#define HAVE_POSIX_CLOCKS*/
-
-/*
- * Define this if we have pthread_cond_timedwait_monotonic() and
- * clock_gettime(CLOCK_MONOTONIC).
- */
-/* #define HAVE_TIMEDWAIT_MONOTONIC */
+#define HAVE_POSIX_CLOCKS
 
 /*
  * Define this if we have linux style epoll()
@@ -250,11 +241,6 @@
  * type for the third argument to mincore().
  */
 #define MINCORE_POINTER_TYPE unsigned char *
-
-/*
- * Do we have the sigaction flag SA_NOCLDWAIT?
- */
-#define HAVE_SA_NOCLDWAIT
 
 /*
  * The default path separator for the platform

@@ -51,25 +51,22 @@ ifeq ($(LOCAL_DROIDDOC_CUSTOM_ASSET_DIR),)
 LOCAL_DROIDDOC_CUSTOM_ASSET_DIR := assets
 endif
 
-
+ifeq ($(LOCAL_IS_HOST_MODULE),true)
 $(full_target): PRIVATE_BOOTCLASSPATH :=
-ifeq ($(BUILD_OS),linux)
-# You have to set bootclasspath for javadoc manually on linux since Java 6.
-host_jdk_rt_jar := $(dir $(HOST_JDK_TOOLS_JAR))../jre/lib/rt.jar
-$(full_target): PRIVATE_BOOTCLASSPATH := $(host_jdk_rt_jar)
-endif
-
-ifneq ($(LOCAL_IS_HOST_MODULE),true)
+else
 
 ifneq ($(LOCAL_SDK_VERSION),)
   ifeq ($(LOCAL_SDK_VERSION)$(TARGET_BUILD_APPS),current)
     # Use android_stubs_current if LOCAL_SDK_VERSION is current and no TARGET_BUILD_APPS.
     LOCAL_JAVA_LIBRARIES := android_stubs_current $(LOCAL_JAVA_LIBRARIES)
+    $(full_target): PRIVATE_BOOTCLASSPATH := $(call java-lib-files, android_stubs_current)
   else
     LOCAL_JAVA_LIBRARIES := sdk_v$(LOCAL_SDK_VERSION) $(LOCAL_JAVA_LIBRARIES)
+    $(full_target): PRIVATE_BOOTCLASSPATH := $(call java-lib-files, sdk_v$(LOCAL_SDK_VERSION))
   endif
 else
-  LOCAL_JAVA_LIBRARIES := core ext framework framework2 $(LOCAL_JAVA_LIBRARIES)
+  LOCAL_JAVA_LIBRARIES := core-libart ext framework framework2 $(LOCAL_JAVA_LIBRARIES)
+  $(full_target): PRIVATE_BOOTCLASSPATH := $(call java-lib-files, core-libart)
 endif  # LOCAL_SDK_VERSION
 LOCAL_JAVA_LIBRARIES := $(sort $(LOCAL_JAVA_LIBRARIES))
 
@@ -162,8 +159,10 @@ $(full_target): $(full_src_files) $(droiddoc_templates) $(droiddoc) $(html_dir_f
 			$(PRIVATE_SOURCE_INTERMEDIATES_DIR) $(PRIVATE_ADDITIONAL_JAVA_DIR))
 	$(hide) ( \
 		javadoc \
+                -encoding UTF-8 \
                 \@$(PRIVATE_SRC_LIST_FILE) \
                 -J-Xmx1280m \
+                -XDignore.symbol.file \
                 $(PRIVATE_PROFILING_OPTIONS) \
                 -quiet \
                 -doclet com.google.doclava.Doclava \
@@ -195,11 +194,14 @@ $(full_target): $(full_src_files) $(full_java_lib_deps)
 			$(PRIVATE_SOURCE_INTERMEDIATES_DIR) $(PRIVATE_ADDITIONAL_JAVA_DIR))
 	$(hide) ( \
 		javadoc \
+                -encoding UTF-8 \
                 $(PRIVATE_DROIDDOC_OPTIONS) \
                 \@$(PRIVATE_SRC_LIST_FILE) \
                 -J-Xmx1024m \
+                -XDignore.symbol.file \
                 $(PRIVATE_PROFILING_OPTIONS) \
                 $(addprefix -classpath ,$(PRIVATE_CLASSPATH)) \
+                $(addprefix -bootclasspath ,$(PRIVATE_BOOTCLASSPATH)) \
                 -sourcepath $(PRIVATE_SOURCE_PATH)$(addprefix :,$(PRIVATE_CLASSPATH)) \
                 -d $(PRIVATE_OUT_DIR) \
                 -quiet \
@@ -230,6 +232,8 @@ $(out_zip): $(full_target)
 	@rm -f $@
 	@mkdir -p $(dir $@)
 	$(hide) ( F=$$(pwd)/$@ ; cd $(PRIVATE_DOCS_DIR) && zip -rq $$F * )
+
+$(LOCAL_MODULE)-docs.zip : $(out_zip)
 
 $(call dist-for-goals,docs,$(out_zip))
 
